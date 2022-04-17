@@ -1,2 +1,2 @@
 # Zabbix-Templates
-My 
+My zabbix saved templates
