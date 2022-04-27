@@ -1,0 +1,172 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-27T19:36:57Z'
+  groups:
+    -
+      uuid: dc579cd7a1a34222933f24f52a68bcd8
+      name: Linux
+  templates:
+    -
+      uuid: e8829490e6f74332afed32260d4f5fe2
+      template: LinuxInfo
+      name: 'Linux Informations'
+      description: |
+        Get linux info with basic commands
+        
+        Need "AllowKey=System.Run[*]" Argument in Zabbix Agent
+        
+        
+        Feel free to edit and be happy :D
+        
+        Made by: Felipe Martins
+        https://github.com/ShadowFFox
+      groups:
+        -
+          name: Linux
+      items:
+        -
+          uuid: ef27bfa77b0f4196aec46d4aba6b21d1
+          name: Memory
+          key: 'system.run[free | awk ''NR==2'' | awk ''{print $2}'']'
+          delay: 24h
+          value_type: FLOAT
+          units: Bytes
+          description: 'Agent Run "free" command with total memory line filtering'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1000'
+          tags:
+            -
+              tag: 'System Information'
+              value: Memory
+        -
+          uuid: cfe70bd3d683479b8c2d0b065a225b99
+          name: 'Swap Memory'
+          key: 'system.run[free | awk ''NR==3'' | awk ''{print $2}'']'
+          delay: 24h
+          value_type: FLOAT
+          units: Bytes
+          description: 'Agent Run "free" command with total swap memory line filtering'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1000'
+          tags:
+            -
+              tag: 'System Information'
+              value: Memory
+        -
+          uuid: a7104a63468e4a9380065e9c68cc27d5
+          name: Domain
+          key: 'system.run[hostname -d]'
+          delay: 24h
+          trends: '0'
+          value_type: TEXT
+          description: 'Agent Run "hostname" command with Domain filter'
+          inventory_link: LOCATION
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+        -
+          uuid: 441d0f66c06e435fbe81e0935231665a
+          name: Hostname
+          key: 'system.run[hostname -s]'
+          delay: 24h
+          trends: '0'
+          value_type: TEXT
+          description: 'Agent Run "hostname" command'
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+        -
+          uuid: 6ca6bc8406c549c3abe49f0eb9f8da89
+          name: 'CPU Arch'
+          key: 'system.run[lscpu | awk ''NR==1'' | awk ''{print $2}'']'
+          delay: 24h
+          trends: '0'
+          value_type: TEXT
+          description: 'Agent Run "lscpu" command with arch line filtering'
+          inventory_link: HW_ARCH
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+        -
+          uuid: 2dcef2ef917445ecb575e0ae97b65a1e
+          name: 'CPU Cores'
+          key: 'system.run[lscpu | awk ''NR==4'' | awk ''{print $2}'']'
+          delay: 24h
+          units: Cores
+          description: 'Agent Run "lscpu" command with core count line filtering'
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+        -
+          uuid: c5455b56147e4b3a8d7c0f15054a0e0b
+          name: 'CPU Vendor'
+          key: 'system.run[lscpu | awk ''NR==9'' | awk ''{print $3}'']'
+          delay: 24h
+          trends: '0'
+          value_type: TEXT
+          description: 'Agent Run "lscpu" command with CPU Vendor line filtering'
+          inventory_link: VENDOR
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+        -
+          uuid: 043e1a9bf3104df091394648550a857f
+          name: 'CPU Model'
+          key: 'system.run[lscpu | awk ''NR==11'' | awk ''{print $3}'']'
+          delay: 24h
+          trends: '0'
+          value_type: TEXT
+          description: 'Agent Run "lscpu" command with CPU Model line filtering'
+          inventory_link: MODEL
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+        -
+          uuid: 0b48d63a893e4ff89626320bc40703c4
+          name: 'CPU Max Frequency'
+          key: 'system.run[lscpu | awk ''NR==13'' | awk ''{print $4}'']'
+          delay: 24h
+          units: Hz
+          description: 'Agent Run "lscpu" command with CPU Max Frequency line filtering'
+          preprocessing:
+            -
+              type: STR_REPLACE
+              parameters:
+                - ','
+                - .
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+        -
+          uuid: 390251f527154796a9162fbe8048e148
+          name: 'CPU Min Frequency'
+          key: 'system.run[lscpu | awk ''NR==14'' | awk ''{print $4}'']'
+          delay: 24h
+          units: MHz
+          description: 'Agent Run "lscpu" command with CPU Min Frequency line filtering'
+          preprocessing:
+            -
+              type: STR_REPLACE
+              parameters:
+                - ','
+                - .
+          tags:
+            -
+              tag: 'System Information'
+              value: CPU
+      tags:
+        -
+          tag: 'System Info'
