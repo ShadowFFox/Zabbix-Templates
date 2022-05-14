@@ -1,0 +1,210 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-05-14T03:09:37Z'
+  groups:
+    -
+      uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
+      name: Energy
+  templates:
+    -
+      uuid: 125275aa79ac496597602fbd3da5205f
+      template: 'UPS WebPower Smart II Card'
+      name: 'UPS WebPower Smart II Card'
+      groups:
+        -
+          name: Energy
+      items:
+        -
+          uuid: 05fa212b690a400bb61262a998a7e1cb
+          name: 'UPS Battery Temperature'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.3.1.0
+          key: UPSBattTemp
+          units: ºC
+        -
+          uuid: b85b6f24b27d4ac5865bc55c98c4fcd9
+          name: 'UPS Battery Use Time'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.2.2.0
+          key: UPSBattUseTime
+        -
+          uuid: f31eca4a233145739abce6490291d083
+          name: 'UPS Battery Charge'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.2.4
+          key: UPSCharge
+          units: '%'
+          triggers:
+            -
+              uuid: bdc9aac5859341daad87bfff6e405dc3
+              expression: 'last(/UPS WebPower Smart II Card/UPSCharge)<50'
+              name: 'Bateria do {HOST.NAME} abaixo de 50%'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'Bateria do {HOST.NAME} em estado critico (abaixo de 20%)'
+                  expression: 'last(/UPS WebPower Smart II Card/UPSCharge)<20'
+              tags:
+                -
+                  tag: Application
+                  value: Nobreak
+            -
+              uuid: 61d2fc0a142f4d328d8971aebc909f39
+              expression: 'last(/UPS WebPower Smart II Card/UPSCharge)<80'
+              name: 'Bateria do {HOST.NAME} abaixo de 80%'
+              priority: AVERAGE
+              dependencies:
+                -
+                  name: 'Bateria do {HOST.NAME} abaixo de 50%'
+                  expression: 'last(/UPS WebPower Smart II Card/UPSCharge)<50'
+              tags:
+                -
+                  tag: Application
+                  value: Nobreak
+            -
+              uuid: 63ac57d73d4e430fa08f70210f7181ec
+              expression: 'last(/UPS WebPower Smart II Card/UPSCharge)<20'
+              name: 'Bateria do {HOST.NAME} em estado critico (abaixo de 20%)'
+              priority: DISASTER
+              tags:
+                -
+                  tag: Application
+                  value: Nobreak
+        -
+          uuid: 56f972dd4a6b4dfba9a52fbf335bb5c0
+          name: 'UPS Hostname'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: UPSHostname
+          trends: '0'
+          value_type: TEXT
+          inventory_link: NAME
+        -
+          uuid: 749e3a1890264d3e909edfd9e1a66bc2
+          name: 'UPS Input Frequency'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.3.3.1.2.1
+          key: UPSInputFreq
+          units: Hz
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+        -
+          uuid: 95e9d024b01c4be1b74816d8888dded8
+          name: 'UPS Input Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.3.3.1.3.1
+          key: UPSInputVoltage
+          value_type: FLOAT
+          units: V
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+        -
+          uuid: f75e80d47c6846f7b5b5616b0f28a86b
+          name: 'UPS Location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: UPSLocation
+          trends: '0'
+          value_type: TEXT
+          inventory_link: LOCATION
+        -
+          uuid: c7afd18a745047b58eeeea72b3c599f1
+          name: 'UPS Mode'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.2.1.0
+          key: UPSMode
+          triggers:
+            -
+              uuid: db0cf45ace2440b6905596e7495fbcff
+              expression: 'last(/UPS WebPower Smart II Card/UPSMode)=5'
+              name: '{HOST.NAME} em modo Bateria'
+              priority: HIGH
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: Application
+                  value: Nobreak
+            -
+              uuid: bcbc96ccda7f42fc9df840a44deae049
+              expression: 'last(/UPS WebPower Smart II Card/UPSMode)>5'
+              name: '{HOST.NAME} em modo Booster / Reducer'
+              priority: HIGH
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: Application
+                  value: Nobreak
+            -
+              uuid: e5766a5f7d2e47138d8e0c9a25c20e77
+              expression: 'last(/UPS WebPower Smart II Card/UPSMode)=4'
+              name: '{HOST.NAME} em modo Bypass'
+              priority: HIGH
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: Application
+                  value: Nobreak
+            -
+              uuid: bd08a392f9dd415aa4052543a1519075
+              expression: 'last(/UPS WebPower Smart II Card/UPSMode)=2'
+              name: '{HOST.NAME} sem saída de energia'
+              priority: HIGH
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: Application
+                  value: Nobreak
+        -
+          uuid: fb550118a92b445482956a4c3820eac8
+          name: 'UPS Output Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.4.4.1.2.1
+          key: UPSOutputVoltage
+          units: V
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+        -
+          uuid: cbd0d8b74c374b53be39fd9f94b93eb9
+          name: 'UPS System'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: UPSSystem
+          trends: '0'
+          value_type: TEXT
+          inventory_link: OS
+        -
+          uuid: d9138b9a5f264f89848d2cf036939f5d
+          name: 'UPS Battery Use'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2468.1.2.1.1.4.4.1.5.1
+          key: UPSUse
+          units: '%'
+      httptests:
+        -
+          uuid: 9243ed6d74194db8a6c0a5dca63f5d78
+          name: 'Web Management'
+          agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36 Edge/80.0.361.66'
+          steps:
+            -
+              name: 'Web Management'
+              url: 'http://{HOST.IP}/'
+              follow_redirects: 'NO'
+  triggers:
+    -
+      uuid: 5f12134a439d4191bb289747551addda
+      expression: 'last(/UPS WebPower Smart II Card/web.test.fail[Web Management])>=1'
+      name: 'Falha no Web Management do {HOST.NAME}'
+      priority: HIGH
+      tags:
+        -
+          tag: Application
+          value: Nobreak
